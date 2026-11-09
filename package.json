@@ -1,7 +1,8 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "smart-energy-management",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Fuzzy-logic powered dashboard that estimates per-appliance energy usage and recommends savings.",
   "type": "module",
   "scripts": {
     "dev": "vite",

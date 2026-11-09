@@ -42,12 +42,12 @@ const ApplianceCard: React.FC<ApplianceCardProps> = ({
               : "bg-green-500/20"
           }`}
           style={{
-            ["--progress-foreground" as any]: usage > 70
+            "--progress-foreground": usage > 70
               ? "rgb(239, 68, 68)"
               : usage > 50
               ? "rgb(234, 179, 8)"
               : "rgb(34, 197, 94)"
-          }}
+          } as React.CSSProperties}
         />
       </CardContent>
     </Card>

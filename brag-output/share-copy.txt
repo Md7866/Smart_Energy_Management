@@ -1,1 +1,0 @@
-Smart Home Harmony Engine: fuzzy-logic energy estimates for every appliance, all in the browser. No backend, no setup — just move the sliders and watch your home respond.
