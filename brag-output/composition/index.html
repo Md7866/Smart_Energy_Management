@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Smart Home Harmony Engine — Brag</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.4/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; }
+      body { margin: 0; background: #0b0f14; color: #ffffff; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #f3f4f6;
+      }
+
+      /* Background always on */
+      #bg { position: absolute; inset: 0; background: #f3f4f6; }
+
+      /* Sub-composition hosts */
+      #hook { position: absolute; inset: 0; }
+      #dashboard { position: absolute; inset: 0; }
+      #outro { position: absolute; inset: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-width="1920" data-height="1080" data-duration="20">
+      <div id="bg"></div>
+
+      <!-- Sub-composition hosts -->
+      <div id="hook"
+           data-composition-src="scenes/hook.html"
+           data-composition-id="hook"
+           data-start="0" data-duration="3"
+           data-track-index="1"></div>
+
+      <div id="dashboard"
+           data-composition-src="scenes/dashboard.html"
+           data-composition-id="dashboard"
+           data-start="3" data-duration="17"
+           data-track-index="2"></div>
+
+      <div id="outro"
+           data-composition-src="scenes/outro.html"
+           data-composition-id="outro"
+           data-start="16" data-duration="4"
+           data-track-index="3"></div>
+    </div>
+    <script>
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

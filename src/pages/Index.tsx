@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { useTheme, THEMES, type Theme } from "@/components/theme-provider";
 import { 
   Thermometer, 
   Clock, 
@@ -18,7 +20,10 @@ import {
   ChefHat,
   Square,
   Fan,
-  Lightbulb
+  Lightbulb,
+  Sun,
+  Flower,
+  Leaf,
 } from "lucide-react";
 import { calculateApplianceUsage, getRecommendations, ApplianceOutput } from "@/utils/fuzzyLogic";
 
@@ -74,6 +79,7 @@ const Index = () => {
             <span className="inline-flex items-center rounded-md bg-smart-yellow px-2 py-1 text-xs font-medium text-amber-800">
               Smart Controls
             </span>
+            <ThemeSelector />
           </div>
         </header>
 
@@ -204,5 +210,48 @@ const Index = () => {
     </div>
   );
 };
+
+const themeLabels: Record<Theme, string> = {
+  light: "Light",
+  purple: "Purple",
+  green: "Green",
+};
+
+const themeIcons: Record<Theme, React.ElementType> = {
+  light: Sun,
+  purple: Flower,
+  green: Leaf,
+};
+
+function ThemeSelector() {
+  const { theme, setTheme, mounted } = useTheme();
+
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <div className="inline-flex gap-1">
+      {THEMES.map((t) => {
+        const Icon = themeIcons[t];
+        return (
+          <button
+            key={t}
+            onClick={() => setTheme(t)}
+            aria-label={`Set theme to ${themeLabels[t]}`}
+            className={cn(
+              "flex items-center justify-center w-8 h-8 rounded-md border border-input transition-colors",
+              theme === t
+                ? "bg-primary text-primary-foreground ring-2 ring-ring"
+                : "hover:bg-accent hover:text-accent-foreground text-muted-foreground"
+            )}
+          >
+            <Icon className="h-4 w-4" />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default Index;
