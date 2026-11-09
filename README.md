@@ -71,7 +71,7 @@ Recommendations are then derived from usage thresholds:
 
 ```sh
 # 1. Clone the repository
-git clone https://github.com/Shanmukh4449/Smart_Energy_Management.git
+git clone https://github.com/Md7866/Smart_Energy_Management.git
 cd Smart_Energy_Management
 
 # 2. Install dependencies
@@ -136,6 +136,6 @@ smart-home-harmony-engine/
 
 ## Author
 
-**N. Chetan** — [@Shanmukh4449](https://github.com/Shanmukh4449)
+**N. Chetan** — [@Md7866](https://github.com/Md7866)
 
 If you found this project useful or interesting, feel free to star the repository.
