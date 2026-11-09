@@ -7,51 +7,283 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.4/dist/gsap.min.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 100%; height: 100%; overflow: hidden; }
-      body { margin: 0; background: #0b0f14; color: #ffffff; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      html, body { width: 100%; height: 100%; overflow: hidden; margin: 0; }
+      body { background: #0b0f14; color: #ffffff; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #f3f4f6; }
+      .clip { position: absolute; inset: 0; }
 
-      #root {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: #f3f4f6;
-      }
+      /* Scene 1: Hook */
+      .hook-content { text-align: center; }
+      .hook-line { opacity: 0; font-size: 64px; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; transform: translateY(20px); }
 
-      /* Background always on */
-      #bg { position: absolute; inset: 0; background: #f3f4f6; }
+      /* Dashboard chrome */
+      .dashboard { width: 100%; height: 100%; padding: 48px; display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; opacity: 0; color: #1f2937; }
+      .dashboard-header { grid-column: 1 / -1; margin-bottom: 8px; }
+      .dashboard-title { font-size: 40px; font-weight: 800; color: #111827; letter-spacing: -0.03em; margin-bottom: 4px; }
+      .dashboard-subtitle { font-size: 18px; color: #6b7280; }
 
-      /* Sub-composition hosts */
-      #hook { position: absolute; inset: 0; }
-      #dashboard { position: absolute; inset: 0; }
-      #outro { position: absolute; inset: 0; }
+      .input-column { display: flex; flex-direction: column; gap: 20px; }
+      .input-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+      .input-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 10px; }
+      .slider-track { height: 6px; background: #e5e7eb; border-radius: 3px; position: relative; overflow: hidden; }
+      .slider-fill { position: absolute; left: 0; top: 0; height: 100%; background: #9b87f5; border-radius: 3px; width: 62.5%; }
+      .slider-thumb { position: absolute; width: 20px; height: 20px; background: #9b87f5; border-radius: 50%; left: 0; top: -7px; box-shadow: 0 2px 6px rgba(155,135,245,0.4); }
+      .slider-value { font-size: 24px; font-weight: 700; color: #111827; margin-top: 14px; text-align: right; }
+      .presence-row { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; }
+      .presence-label { font-size: 14px; color: #374151; }
+      .presence-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; background: #dcfce7; color: #166534; font-size: 13px; font-weight: 600; }
+      .presence-toggle { width: 44px; height: 24px; background: #e5e7eb; border-radius: 12px; position: relative; }
+      .presence-knob { position: absolute; width: 18px; height: 18px; background: #ffffff; border-radius: 50%; top: 3px; left: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+      .graph-toggle { margin-top: 14px; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #374151; }
+      .graph-toggle-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 24px; background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; }
+
+      .results-column { display: flex; flex-direction: column; gap: 14px; }
+      .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; opacity: 0; transform: translateY(16px); }
+      .appliance-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-top: 3px solid #9b87f5; transform: translateY(16px); opacity: 0; }
+      .card-header { display: flex; align-items: center; gap: 10px; width: 100%; }
+      .card-icon { width: 36px; height: 36px; background: #9b87f5; color: #ffffff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+      .card-name { font-size: 18px; font-weight: 700; color: #111827; }
+      .card-usage { font-size: 28px; font-weight: 800; color: #111827; margin-left: auto; }
+      .card-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+      .card-bar-fill { height: 100%; background: #10b981; border-radius: 4px; width: 0%; }
+
+      .energy-graph { opacity: 0; transform: translateY(20px); background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 24px; margin-top: 14px; }
+      .graph-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 14px; }
+      .graph-bars { display: flex; align-items: flex-end; gap: 12px; height: 130px; padding-bottom: 18px; }
+      .graph-bar { width: 46px; background: #e5e7eb; border-radius: 6px 6px 0 0; display: flex; align-items: flex-end; justify-content: center; gap: 2px; }
+      .graph-bar-fill { width: 100%; border-radius: 6px 6px 0 0; }
+      .graph-label { font-size: 12px; color: #6b7280; text-align: center; margin-top: 6px; }
+
+      /* Scene 5: Outro */
+      .outro-content { text-align: center; }
+      .outro-main { opacity: 0; font-size: 48px; font-weight: 800; color: #111827; letter-spacing: -0.02em; transform: translateY(20px); }
+      .outro-sub { opacity: 0; font-size: 20px; color: #4b5563; margin-top: 12px; transform: translateY(20px); }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-width="1920" data-height="1080" data-duration="20">
-      <div id="bg"></div>
+      <div id="bg" style="position:absolute; inset:0; background:#f3f4f6;"></div>
 
-      <!-- Sub-composition hosts -->
-      <div id="hook"
-           data-composition-src="scenes/hook.html"
-           data-composition-id="hook"
-           data-start="0" data-duration="3"
-           data-track-index="1"></div>
+      <!-- Scene 1: Hook (0-3s) -->
+      <div id="hook" class="clip" data-start="0" data-duration="3">
+        <div class="hook-content">
+          <h1 id="hook-line1" class="hook-line">Your home is wasting energy.</h1>
+          <h1 id="hook-line2" class="hook-line">You just can't see it.</h1>
+        </div>
+      </div>
 
-      <div id="dashboard"
-           data-composition-src="scenes/dashboard.html"
-           data-composition-id="dashboard"
-           data-start="3" data-duration="17"
-           data-track-index="2"></div>
+      <!-- Scene 2-4: Dashboard (3-16s) -->
+      <div id="dashboard" class="clip" data-start="3" data-duration="13">
+        <div class="dashboard">
+          <div class="dashboard-header">
+            <h1 class="dashboard-title">Smart Home Energy</h1>
+            <p class="dashboard-subtitle">Monitor and optimize your home's energy consumption</p>
+          </div>
 
-      <div id="outro"
-           data-composition-src="scenes/outro.html"
-           data-composition-id="outro"
-           data-start="16" data-duration="4"
-           data-track-index="3"></div>
+          <div class="input-column">
+            <div class="input-card">
+              <div class="input-label">Temperature</div>
+              <div class="slider-track"><div id="slider-fill-temp" class="slider-fill"></div><div id="slider-thumb-temp" class="slider-thumb"></div></div>
+              <div id="temp-value" class="slider-value">25°C</div>
+            </div>
+            <div class="input-card">
+              <div class="input-label">Time of Day</div>
+              <div class="slider-track"><div id="slider-fill-time" class="slider-fill"></div><div id="slider-thumb-time" class="slider-thumb"></div></div>
+              <div id="time-value" class="slider-value">12h</div>
+            </div>
+            <div class="input-card">
+              <div class="input-label">Energy Usage</div>
+              <div class="slider-track"><div id="slider-fill-energy" class="slider-fill"></div><div id="slider-thumb-energy" class="slider-thumb"></div></div>
+              <div id="energy-value" class="slider-value">50%</div>
+            </div>
+            <div class="presence-row">
+              <div class="presence-label">User Presence</div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span id="presence-text" class="presence-badge">Present</span>
+                <div class="presence-toggle"><div id="presence-knob" class="presence-knob"></div></div>
+              </div>
+            </div>
+            <div class="graph-toggle">
+              <span id="graph-btn-text">Show Energy Graph</span>
+              <div class="graph-toggle-btn" id="graph-btn-icon">▸</div>
+            </div>
+          </div>
+
+          <div class="results-column">
+            <div class="cards-grid" id="cards-grid">
+              <div class="appliance-card" id="card-ac">
+                <div class="card-header"><div class="card-icon">❄️</div><div class="card-name">AC</div><div class="card-usage" id="usage-ac">0%</div></div>
+                <div class="card-bar"><div id="bar-fill-ac" class="card-bar-fill"></div></div>
+              </div>
+              <div class="appliance-card" id="card-oven">
+                <div class="card-header"><div class="card-icon">🍳</div><div class="card-name">Oven</div><div class="card-usage" id="usage-oven">0%</div></div>
+                <div class="card-bar"><div id="bar-fill-oven" class="card-bar-fill"></div></div>
+              </div>
+              <div class="appliance-card" id="card-fridge">
+                <div class="card-header"><div class="card-icon">🧊</div><div class="card-name">Refrigerator</div><div class="card-usage" id="usage-fridge">0%</div></div>
+                <div class="card-bar"><div id="bar-fill-fridge" class="card-bar-fill"></div></div>
+              </div>
+              <div class="appliance-card" id="card-fan">
+                <div class="card-header"><div class="card-icon">💨</div><div class="card-name">Fan</div><div class="card-usage" id="usage-fan">0%</div></div>
+                <div class="card-bar"><div id="bar-fill-fan" class="card-bar-fill"></div></div>
+              </div>
+              <div class="appliance-card" id="card-light">
+                <div class="card-header"><div class="card-icon">💡</div><div class="card-name">Light</div><div class="card-usage" id="usage-light">0%</div></div>
+                <div class="card-bar"><div id="bar-fill-light" class="card-bar-fill"></div></div>
+              </div>
+            </div>
+
+            <div class="energy-graph" id="energy-graph">
+              <div class="graph-title">Energy Usage by Appliance</div>
+              <div class="graph-bars">
+                <div class="graph-bar"><div id="gfill-ac" class="graph-bar-fill" style="background:#9b87f5;"></div><div class="graph-label">AC</div></div>
+                <div class="graph-bar"><div id="gfill-oven" class="graph-bar-fill" style="background:#f97316;"></div><div class="graph-label">Oven</div></div>
+                <div class="graph-bar"><div id="gfill-fridge" class="graph-bar-fill" style="background:#0ea5e9;"></div><div class="graph-label">Fridge</div></div>
+                <div class="graph-bar"><div id="gfill-fan" class="graph-bar-fill" style="background:#10b981;"></div><div class="graph-label">Fan</div></div>
+                <div class="graph-bar"><div id="gfill-light" class="graph-bar-fill" style="background:#fbbf24;"></div><div class="graph-label">Light</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 5: Outro (16-20s) -->
+      <div id="outro" class="clip" data-start="16" data-duration="4">
+        <div class="outro-content">
+          <h1 id="outro-main" class="outro-main">Smart Home Harmony Engine</h1>
+          <p id="outro-sub" class="outro-sub">Fuzzy-logic energy estimates. All in the browser.</p>
+        </div>
+      </div>
     </div>
+
     <script>
-      window.__timelines["main"] = gsap.timeline({ paused: true });
+      const tl = gsap.timeline({ paused: true });
+
+      // Initial thumb positions
+      gsap.set("#slider-thumb-temp", { x: 386 });
+      gsap.set("#slider-thumb-time", { x: 386 });
+      gsap.set("#slider-thumb-energy", { x: 386 });
+
+      // === SCENE 1: Hook (0-3s) ===
+      tl.to("#hook-line1", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.3);
+      tl.to("#hook-line1", { opacity: 0, duration: 0.4 }, 1.7);
+      tl.to("#hook-line2", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 1.9);
+      tl.to("#hook-line2", { opacity: 0, duration: 0.4 }, 2.8);
+
+      // === SCENE 2: Dashboard reveal (3-7s) ===
+      tl.to("#dashboard", { opacity: 1, duration: 0.9, ease: "power3.out" }, 3.0);
+      tl.to("#cards-grid", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.2);
+
+      tl.to("#card-ac", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.7)" }, 3.4);
+      tl.to("#card-oven", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.7)" }, 3.85);
+      tl.to("#card-fridge", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.7)" }, 4.3);
+      tl.to("#card-fan", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.7)" }, 4.75);
+      tl.to("#card-light", { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.7)" }, 5.2);
+
+      // === SCENE 3: Live fuzzy logic (7-12s) ===
+      // Temperature 25 -> 35
+      tl.to("#slider-fill-temp", { width: "87.5%", duration: 1.1, ease: "power2.inOut" }, 7.0);
+      tl.to("#slider-thumb-temp", { x: 540, duration: 1.1, ease: "power2.inOut" }, 7.0);
+      tl.to({}, { duration: 1.1, onUpdate: function() {
+        const p = this.progress();
+        const v = Math.round(25 + p * 10);
+        document.getElementById("temp-value").textContent = v + "°C";
+      }}, 7.0);
+
+      // AC + Fan respond to temp
+      tl.to({}, { duration: 1.1, onUpdate: function() {
+        const p = this.progress();
+        const ac = Math.round(p * 75);
+        const fan = Math.round(p * 60);
+        document.getElementById("usage-ac").textContent = ac + "%";
+        document.getElementById("bar-fill-ac").style.width = ac + "%";
+        document.getElementById("usage-fan").textContent = fan + "%";
+        document.getElementById("bar-fill-fan").style.width = fan + "%";
+      }}, 7.1);
+
+      // Time of day 12 -> 19
+      tl.to("#slider-fill-time", { width: "79.2%", duration: 1.0, ease: "power2.inOut" }, 8.4);
+      tl.to("#slider-thumb-time", { x: 489, duration: 1.0, ease: "power2.inOut" }, 8.4);
+      tl.to({}, { duration: 1.0, onUpdate: function() {
+        const p = this.progress();
+        const v = Math.round(12 + p * 7);
+        document.getElementById("time-value").textContent = v + "h";
+      }}, 8.4);
+
+      // Light responds to evening
+      tl.to({}, { duration: 1.0, onUpdate: function() {
+        const p = this.progress();
+        const v = Math.round(20 + p * 60);
+        document.getElementById("usage-light").textContent = v + "%";
+        document.getElementById("bar-fill-light").style.width = v + "%";
+      }}, 8.5);
+
+      // Energy usage 50 -> 80
+      tl.to("#slider-fill-energy", { width: "80%", duration: 1.0, ease: "power2.inOut" }, 9.5);
+      tl.to("#slider-thumb-energy", { x: 494, duration: 1.0, ease: "power2.inOut" }, 9.5);
+      tl.to({}, { duration: 1.0, onUpdate: function() {
+        const p = this.progress();
+        const v = Math.round(50 + p * 30);
+        document.getElementById("energy-value").textContent = v + "%";
+      }}, 9.5);
+
+      // Presence OFF
+      tl.to({}, { duration: 0, onUpdate: function() {
+        document.getElementById("presence-knob").style.left = "24px";
+        document.getElementById("presence-text").textContent = "Absent";
+        document.getElementById("presence-text").style.backgroundColor = "#fee2e2";
+        document.getElementById("presence-text").style.color = "#991b1b";
+      }}, 10.6);
+      tl.to({}, { duration: 0.4, onUpdate: function() {
+        const p = this.progress();
+        const ac = Math.round(75 * (1 - p));
+        const oven = Math.round(30 * (1 - p));
+        const fan = Math.round(60 * (1 - p));
+        const light = Math.round(80 * (1 - p));
+        document.getElementById("usage-ac").textContent = ac + "%";
+        document.getElementById("bar-fill-ac").style.width = ac + "%";
+        document.getElementById("usage-oven").textContent = oven + "%";
+        document.getElementById("bar-fill-oven").style.width = oven + "%";
+        document.getElementById("usage-fan").textContent = fan + "%";
+        document.getElementById("bar-fill-fan").style.width = fan + "%";
+        document.getElementById("usage-light").textContent = light + "%";
+        document.getElementById("bar-fill-light").style.width = light + "%";
+      }}, 10.6);
+
+      // Presence ON
+      tl.to({}, { duration: 0, onUpdate: function() {
+        document.getElementById("presence-knob").style.left = "3px";
+        document.getElementById("presence-text").textContent = "Present";
+        document.getElementById("presence-text").style.backgroundColor = "#dcfce7";
+        document.getElementById("presence-text").style.color = "#166534";
+      }}, 11.2);
+
+      // === SCENE 4: Graph + Theme (12-16s) ===
+      tl.to({}, { duration: 0, onUpdate: function() {
+        document.getElementById("graph-btn-text").textContent = "Hide Energy Graph";
+      }}, 12.0);
+      tl.to("#graph-btn-icon", { rotation: 90, duration: 0.3 }, 12.0);
+      tl.to("#energy-graph", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 12.2);
+
+      tl.to("#gfill-ac", { height: "75%", duration: 0.8 }, 12.6);
+      tl.to("#gfill-oven", { height: "40%", duration: 0.8 }, 12.8);
+      tl.to("#gfill-fridge", { height: "55%", duration: 0.8 }, 13.0);
+      tl.to("#gfill-fan", { height: "60%", duration: 0.8 }, 13.2);
+      tl.to("#gfill-light", { height: "80%", duration: 0.8 }, 13.4);
+
+      // Theme color cycle
+      tl.to("#root", { "--bg": "#9b87f5", duration: 0.25 }, 14.2);
+      tl.to("#root", { "--bg": "#10b981", duration: 0.25 }, 14.6);
+      tl.to("#root", { "--bg": "#111827", duration: 0.25 }, 15.0);
+      tl.to("#root", { "--bg": "#f3f4f6", duration: 0.25 }, 15.4);
+
+      // === SCENE 5: Outro (16-20s) ===
+      tl.to("#outro-main", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 16.2);
+      tl.to("#outro-sub", { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 16.8);
+      tl.to("#outro-main", { opacity: 0, duration: 0.4 }, 19.4);
+      tl.to("#outro-sub", { opacity: 0, duration: 0.4 }, 19.6);
+
+      window.__timelines["main"] = tl;
     </script>
   </body>
 </html>
