@@ -136,6 +136,6 @@ smart-home-harmony-engine/
 
 ## Author
 
-**N. Chetan** — [@Md7866](https://github.com/Md7866)
+**Mohammad Arshad** — [@Md7866](https://github.com/Md7866)
 
 If you found this project useful or interesting, feel free to star the repository.
